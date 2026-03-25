@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Modal, Image, Button, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Modal, Image, Button, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 
 export default function App() {
-  // Correção: Uso de colchetes [] para o useState
-  const [visible, setVisible] = useState(false);
-  
-  // Novo estado para guardar as informações do planeta clicado
-  const [planetaSelecionado, setPlanetaSelecionado] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedPlanet, setSelectedPlanet] = useState(null);
 
   const planetas = [
     {
@@ -59,48 +56,47 @@ export default function App() {
     },
   ];
 
-  // Função para lidar com o clique em um planeta
-  const abrirModalDoPlaneta = (planeta) => {
-    setPlanetaSelecionado(planeta); // Salva o planeta clicado no estado
-    setVisible(true);               // Abre o modal
+  const openModal = (planet) => {
+    setSelectedPlanet(planet);
+    setModalVisible(true);
   };
 
-  // Função para fechar o modal e limpar a seleção
-  const fecharModal = () => {
-    setVisible(false);
-    setPlanetaSelecionado(null);
+  const closeModal = () => {
+    setSelectedPlanet(null);
+    setModalVisible(false);
   };
+
+  const renderPlanetItem = ({ item }) => (
+    <TouchableOpacity style={styles.cardContainer} onPress={() => openModal(item)}>
+      <Image source={item.imagem} style={styles.cardIcon} />
+      <Text style={styles.cardLabel}>{item.nome}</Text>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.tituloSecao}>Selecione um Planeta</Text>
-      
-      {/* ScrollView e map para listar todos os planetas na tela */}
-      <ScrollView style={styles.lista}>
-        {planetas.map((planeta, index) => (
-          <TouchableOpacity 
-            key={index} 
-            style={styles.botaoLista}
-            onPress={() => abrirModalDoPlaneta(planeta)}
-          >
-            <Text style={styles.textoBotao}>{planeta.nome}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <Text style={styles.screenTitle}>Selecione o planeta:</Text>
 
-      {/* O modal só tenta renderizar o conteúdo se 'planetaSelecionado' não for nulo */}
-      <Modal visible={visible} animationType="slide">
-        <View style={styles.modalContainer}>
-          {planetaSelecionado && (
+      <FlatList
+        data={planetas}
+        renderItem={renderPlanetItem}
+        keyExtractor={(item) => item.nome}
+        numColumns={2} 
+        contentContainerStyle={styles.listContainer}
+        showsVerticalScrollIndicator={false}
+      />
+
+      <Modal visible={modalVisible} animationType="slide">
+        <View style={styles.modalViewContainer}>
+          {selectedPlanet && (
             <>
-              <Text style={styles.tituloModal}>{planetaSelecionado.nome}</Text>
-              <Image source={planetaSelecionado.imagem} style={styles.imagem} />
-              <Text style={styles.dias}>{planetaSelecionado.dias}</Text>
-              <Text style={styles.descricao}>{planetaSelecionado.texto}</Text>
-              
-              <View style={styles.botaoFecharContainer}>
-                <Button title="Fechar" onPress={fecharModal} color="#FF3B30" />
-              </View>
+              <Image source={selectedPlanet.imagem} style={styles.modalImage} />
+              <Text style={styles.modalTitle}>{selectedPlanet.nome}</Text>
+              <Text style={styles.modalDays}>{selectedPlanet.dias}</Text>
+              <ScrollView style={styles.modalTextScroll} showsVerticalScrollIndicator={false}>
+                <Text style={styles.modalText}>{selectedPlanet.texto}</Text>
+              </ScrollView>
+              <Button title="Fechar" onPress={closeModal} color="#6C63FF" />
             </>
           )}
         </View>
@@ -112,62 +108,77 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F8F9FB',
     paddingTop: 50,
-    backgroundColor: '#f5f5f5',
-    alignItems: 'center',
   },
-  tituloSecao: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  lista: {
-    width: '100%',
+  screenTitle: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#000',
+    marginBottom: 30,
     paddingHorizontal: 20,
+    alignSelf: 'center',
   },
-  botaoLista: {
-    backgroundColor: '#007AFF',
+  listContainer: {
+    paddingHorizontal: 10,
+    paddingBottom: 20,
+  },
+  cardContainer: {
+    flex: 1,
+    margin: 10,
+    aspectRatio: 1,
+    backgroundColor: '#FFF',
+    borderRadius: 16,
     padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
     alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#171717',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
   },
-  textoBotao: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+  cardIcon: {
+    width: 60,
+    height: 60,
+    marginBottom: 10,
+    borderRadius: 30,
   },
-  modalContainer: {
+  cardLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#6C63FF',
+    textAlign: 'center',
+  },
+  modalViewContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF',
   },
-  tituloModal: {
+  modalTitle: {
     fontSize: 32,
     fontWeight: 'bold',
-    marginBottom: 15,
+    marginBottom: 10,
   },
-  imagem: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
+  modalImage: {
+    width: 250,
+    height: 250,
+    borderRadius: 125,
     marginBottom: 20,
   },
-  dias: {
-    fontSize: 16,
-    fontStyle: 'italic',
+  modalDays: {
+    fontSize: 18,
     color: '#666',
-    marginBottom: 15,
+    marginBottom: 20,
   },
-  descricao: {
-    fontSize: 16,
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 30,
+  modalTextScroll: {
+    marginBottom: 20,
   },
-  botaoFecharContainer: {
-    width: '50%',
-  }
+  modalText: {
+    fontSize: 18,
+    textAlign: 'justify',
+    lineHeight: 28,
+  },
 });
