@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Modal, Image, Button, TouchableOpacity, FlatList, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Modal, Image, TouchableOpacity, FlatList, ScrollView, StatusBar, Dimensions } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+
+const { height: screenHeight } = Dimensions.get('window');
 
 export default function App() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -8,51 +12,59 @@ export default function App() {
   const planetas = [
     {
       nome: "Mercúrio",
-      dias: "88 dias para a volta no sol",
+      dias: "88 dias terrestres",
       imagem: require('./assets/mercurio.jpg'),
-      texto: "O menor planeta do Sistema Solar e o mais próximo do Sol. É um mundo rochoso e denso, com superfície coberta por crateras, similar à Lua. Possui temperaturas extremas, variando de 450°C de dia a -180°C à noite, sem satélites naturais.",
+      texto: "O menor planeta do Sistema Solar e o mais próximo do Sol. É um mundo rochoso e denso, com superfície coberta por crateras. Possui temperaturas extremas, variando de 450°C de dia a -180°C à noite.",
+      corPrimaria: '#E5E5E5',
     },
     {
       nome: "Vênus",
-      dias: "255 dias para a volta no sol",
+      dias: "255 dias terrestres",
       imagem: require('./assets/venus.jpg'),
-      texto: "O segundo planeta a partir do Sol e o mais quente do Sistema Solar, com temperaturas superficiais que superam devido a um intenso efeito estufa.",
+      texto: "O segundo planeta a partir do Sol e o mais quente do Sistema Solar, com temperaturas superficiais que superam 460°C devido a um intenso efeito estufa.",
+      corPrimaria: '#FFE0B2',
     },
     {
       nome: "Terra",
-      dias: "365 dias para a volta no sol",
+      dias: "365 dias terrestres",
       imagem: require('./assets/terra.jpg'),
-      texto: "O terceiro planeta a partir do Sol e o único conhecido a abrigar vida, com cerca de 4,5 bilhões de anos. É um planeta rochoso (telúrico), com 70% da superfície coberta por água, o que lhe dá a alcunha de 'Planeta Azul'.",
+      texto: "O terceiro planeta a partir do Sol e o único conhecido a abrigar vida. É um planeta rochoso com 70% da superfície coberta por água, o 'Planeta Azul'.",
+      corPrimaria: '#BBDEFB',
     },
     {
       nome: "Marte",
-      dias: "687 dias para a volta no sol",
+      dias: "687 dias terrestres",
       imagem: require('./assets/marte.jpg'),
-      texto: "O 'Planeta Vermelho', é o quarto planeta a partir do Sol e vizinho da Terra, caracterizado por uma atmosfera rarefeita (principalmente), superfície seca, rochosa e fria com óxido de ferro que lhe dá a cor avermelhada. Possui dias de 24h 37m, estações do ano, vulcões inativos e duas luas pequenas (Fobos e Deimos).",
+      texto: "O 'Planeta Vermelho', caracterizado por uma atmosfera rarefeita, superfície seca, rochosa e fria com óxido de ferro. Possui vulcões inativos e dias similares aos da Terra.",
+      corPrimaria: '#FFCDD2',
     },
     {
       nome: "Júpiter",
-      dias: "4333 dias para a volta no sol",
+      dias: "4333 dias terrestres",
       imagem: require('./assets/jupiter.jpg'),
-      texto: "O maior planeta do Sistema Solar, um gigante gasoso composto principalmente de hidrogênio e hélio, com massa duas vezes e meia superior à de todos os outros planetas combinados.",
+      texto: "O maior planeta do Sistema Solar, um gigante gasoso composto principalmente de hidrogênio e hélio, com massa imensa.",
+      corPrimaria: '#D7CCC8',
     },
     {
       nome: "Saturno",
-      dias: "10.579 dias para a volta no sol",
+      dias: "10.579 dias terrestres",
       imagem: require('./assets/saturno.jpg'),
-      texto: "O sexto planeta a partir do Sol e o segundo maior do Sistema Solar, conhecido por seu impressionante sistema de anéis formados por gelo e rocha.",
+      texto: "O sexto planeta a partir do Sol e o segundo maior, famoso por seu impressionante sistema de anéis formados por gelo e rocha.",
+      corPrimaria: '#FFF9C4',
     },
     {
       nome: "Urano",
-      dias: "30.687 dias para a volta no sol",
+      dias: "30.687 dias terrestres",
       imagem: require('./assets/urano.jpg'),
-      texto: "O sétimo planeta a partir do Sol e o primeiro a ser descoberto por um telescópio. Conhecido como 'gigante de gelo', é um mundo frio, com atmosfera rica em metano, hélio e hidrogênio, o que lhe dá uma cor azul-esverdeada.",
+      texto: "O sétimo planeta, um 'gigante de gelo' frio, com atmosfera rica em metano, o que lhe dá uma cor azul-esverdeada.",
+      corPrimaria: '#B2EBF2',
     },
     {
       nome: "Netuno",
-      dias: "60.190 dias para a volta no sol",
+      dias: "60.190 dias terrestres",
       imagem: require('./assets/netuno.jpg'),
-      texto: "O oitavo e mais distante planeta do Sistema Solar, classificado como um gigante de gelo. Com uma cor azul intensa devido ao metano atmosférico, é extremamente frio, ventoso e possui 14 luas conhecidas. Descoberto em 1846 por cálculos matemáticos",
+      texto: "O oitavo e mais distante planeta, classificado como um gigante de gelo. Com uma cor azul intensa, é extremamente frio e ventoso.",
+      corPrimaria: '#C5CAE9',
     },
   ];
 
@@ -62,20 +74,34 @@ export default function App() {
   };
 
   const closeModal = () => {
-    setSelectedPlanet(null);
     setModalVisible(false);
+    setTimeout(() => setSelectedPlanet(null), 300); 
   };
 
   const renderPlanetItem = ({ item }) => (
-    <TouchableOpacity style={styles.cardContainer} onPress={() => openModal(item)}>
-      <Image source={item.imagem} style={styles.cardIcon} />
-      <Text style={styles.cardLabel}>{item.nome}</Text>
+    <TouchableOpacity style={styles.cardWrapper} onPress={() => openModal(item)}>
+      <LinearGradient
+        colors={['#FFFFFF', item.corPrimaria + '30']}
+        style={styles.cardContainer}
+      >
+        <Image source={item.imagem} style={styles.cardIcon} />
+        <View style={styles.cardTextContent}>
+          <Text style={styles.cardLabel}>{item.nome}</Text>
+          <Text style={styles.cardSubLabel}>{item.dias}</Text>
+        </View>
+        <View style={[styles.cardBorderAccent, { backgroundColor: item.corPrimaria }]} />
+      </LinearGradient>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.screenTitle}>Selecione o planeta:</Text>
+    <LinearGradient colors={['#1A237E', '#4A148C', '#F8F9FB']} style={styles.container} start={{x: 0, y: 0}} end={{x: 1, y: 1}}>
+      <StatusBar barStyle="light-content" />
+      
+      <View style={styles.headerContainer}>
+        <Text style={styles.screenTitle}>Explorador</Text>
+        <Text style={styles.screenSubtitle}>do Sistema Solar</Text>
+      </View>
 
       <FlatList
         data={planetas}
@@ -86,99 +112,173 @@ export default function App() {
         showsVerticalScrollIndicator={false}
       />
 
-      <Modal visible={modalVisible} animationType="slide">
-        <View style={styles.modalViewContainer}>
-          {selectedPlanet && (
-            <>
-              <Image source={selectedPlanet.imagem} style={styles.modalImage} />
-              <Text style={styles.modalTitle}>{selectedPlanet.nome}</Text>
-              <Text style={styles.modalDays}>{selectedPlanet.dias}</Text>
-              <ScrollView style={styles.modalTextScroll} showsVerticalScrollIndicator={false}>
-                <Text style={styles.modalText}>{selectedPlanet.texto}</Text>
-              </ScrollView>
-              <Button title="Fechar" onPress={closeModal} color="#6C63FF" />
-            </>
-          )}
+      <Modal visible={modalVisible} animationType="slide" transparent={true} onRequestClose={closeModal}>
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={closeModal} />
+          
+          <View style={styles.modalContentSheet}>
+            {selectedPlanet && (
+              <>
+                <View style={styles.modalHeader}>
+                  <Text style={styles.modalTitle}>{selectedPlanet.nome}</Text>
+                  <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
+                    <Ionicons name="close-circle" size={32} color="#6C63FF" />
+                  </TouchableOpacity>
+                </View>
+
+                <Image source={selectedPlanet.imagem} style={styles.modalImage} />
+                <Text style={styles.modalDays}>{selectedPlanet.dias} para uma órbita</Text>
+                
+                <ScrollView style={styles.modalTextScroll} showsVerticalScrollIndicator={true}>
+                  <Text style={styles.modalText}>{selectedPlanet.texto}</Text>
+                </ScrollView>
+              </>
+            )}
+          </View>
         </View>
       </Modal>
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FB',
-    paddingTop: 50,
+    paddingTop: 60,
+  },
+  headerContainer: {
+    paddingHorizontal: 25,
+    marginBottom: 20,
   },
   screenTitle: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#000',
-    marginBottom: 30,
-    paddingHorizontal: 20,
-    alignSelf: 'center',
+    fontSize: 34,
+    fontWeight: '800',
+    color: '#FFF',
+    letterSpacing: 0.5,
+  },
+  screenSubtitle: {
+    fontSize: 18,
+    color: '#E0E0E0',
+    fontWeight: '300',
+    marginTop: -5,
   },
   listContainer: {
-    paddingHorizontal: 10,
-    paddingBottom: 20,
+    paddingHorizontal: 15,
+    paddingBottom: 30,
+  },
+  cardWrapper: {
+    flex: 1,
+    margin: 8,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 3},
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
   },
   cardContainer: {
     flex: 1,
-    margin: 10,
-    aspectRatio: 1,
-    backgroundColor: '#FFF',
-    borderRadius: 16,
+    aspectRatio: 1.1,
+    borderRadius: 20,
     padding: 15,
     alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#171717',
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
+    justifyContent: 'space-between',
+    position: 'relative',
+    overflow: 'hidden',
   },
   cardIcon: {
-    width: 60,
-    height: 60,
-    marginBottom: 10,
-    borderRadius: 30,
+    width: '60%', 
+    height: '60%',
+    resizeMode: 'contain',
+    marginTop: 5,
+  },
+  cardTextContent: {
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 5,
   },
   cardLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#6C63FF',
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#4A148C',
     textAlign: 'center',
   },
-  modalViewContainer: {
+  cardSubLabel: {
+    fontSize: 11,
+    color: '#757575',
+    textAlign: 'center',
+    marginTop: 2,
+  },
+  cardBorderAccent: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 4,
+  },
+
+  modalOverlay: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+    justifyContent: 'flex-end',
+  },
+  modalBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContentSheet: {
     backgroundColor: '#FFF',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    height: screenHeight * 0.8,
+    padding: 25,
+    paddingTop: 15,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: -5},
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   modalTitle: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#1A237E',
+  },
+  closeButton: {
+    padding: 5,
   },
   modalImage: {
-    width: 250,
-    height: 250,
-    borderRadius: 125,
-    marginBottom: 20,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    alignSelf: 'center',
+    marginBottom: 15,
+    borderWidth: 3,
+    borderColor: '#F3E5F5',
   },
   modalDays: {
-    fontSize: 18,
-    color: '#666',
+    fontSize: 15,
+    color: '#8E24AA',
+    fontWeight: '600',
+    textAlign: 'center',
     marginBottom: 20,
+    fontStyle: 'italic',
   },
   modalTextScroll: {
-    marginBottom: 20,
+    flex: 1,
+    backgroundColor: '#F3E5F550',
+    borderRadius: 15,
+    padding: 15,
+    marginBottom: 10,
   },
   modalText: {
-    fontSize: 18,
+    fontSize: 16,
+    color: '#333',
     textAlign: 'justify',
-    lineHeight: 28,
+    lineHeight: 25,
   },
 });
